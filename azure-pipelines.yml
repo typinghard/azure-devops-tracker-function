@@ -8,13 +8,13 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '7bbe0a19-1b79-4df3-a9f7-798821e34449'
+  azureSubscription: '061440c6-b8b2-41ab-98dc-8863642471ff'
 
   # Function app name
   functionAppName: 'func-azure-devops-state-tracker'
 
   # Agent VM image name
-  vmImageName: 'vs2017-win2016'
+  vmImageName: 'ubuntu-20.04'
 
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/AzureDevOpsStateTracker.Functions'
