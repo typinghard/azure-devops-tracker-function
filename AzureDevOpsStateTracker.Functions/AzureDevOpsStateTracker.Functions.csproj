@@ -18,9 +18,6 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\azure-devops-state-tracker\AzureDevopsStateTracker\AzureDevopsStateTracker.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
