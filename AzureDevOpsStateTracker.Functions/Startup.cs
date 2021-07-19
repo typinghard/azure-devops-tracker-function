@@ -18,7 +18,7 @@ namespace AzureDevOpsStateTracker.Functions
             builder.Services.AddScoped<ServiceToInject>();
             builder.Services.AddScoped<AzureDevopsStateTrackerService>();
 
-            builder.Services.AddAzureDevopsStateTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection1"], "StateTracker"));
+            builder.Services.AddAzureDevopsStateTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection"], "StateTracker"));
         }
     }
 }
