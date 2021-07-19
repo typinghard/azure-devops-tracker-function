@@ -6,7 +6,7 @@ namespace AzureDevOpsStateTracker.Functions.Extensions
 {
     public static class HttpRequestExtensions
     {
-        public static string ObterCorpo(this HttpRequest request)
+        public static string GetBody(this HttpRequest request)
         {
             string corpo;
             using (StreamReader reader = new StreamReader(request.Body,
