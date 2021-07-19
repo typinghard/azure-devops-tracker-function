@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsStateTracker.Functions", "AzureDevOpsStateTracker.Functions.csproj", "{3C86C085-C8C6-46BB-8315-D4348928034C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevopsStateTracker", "..\..\azure-devops-state-tracker\AzureDevopsStateTracker\AzureDevopsStateTracker.csproj", "{E71EE8C3-7D74-4C91-B244-2394160F7486}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{3C86C085-C8C6-46BB-8315-D4348928034C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C86C085-C8C6-46BB-8315-D4348928034C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C86C085-C8C6-46BB-8315-D4348928034C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E71EE8C3-7D74-4C91-B244-2394160F7486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E71EE8C3-7D74-4C91-B244-2394160F7486}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E71EE8C3-7D74-4C91-B244-2394160F7486}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E71EE8C3-7D74-4C91-B244-2394160F7486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
