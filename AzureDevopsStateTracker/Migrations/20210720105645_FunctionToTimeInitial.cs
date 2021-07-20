@@ -17,7 +17,7 @@ namespace AzureDevopsStateTracker.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            var dropFunction = @$"DROP FUNCTION IF EXISTS {DataBaseConfig.SchemaName}.ToTime";
+            var dropFunction = @$"DROP FUNCTION IF EXISTS dbo.ToTime";
             migrationBuilder.Sql(dropFunction);
         }
     }
