@@ -4,6 +4,7 @@ using AzureDevopsStateTracker.Interfaces.Internals;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AzureDevopsStateTracker.Data
 {
@@ -11,28 +12,30 @@ namespace AzureDevopsStateTracker.Data
     {
         public WorkItemRepository(AzureDevopsStateTrackerContext context) : base(context) { }
 
-        public WorkItem GetByWorkItemId(string workItemId)
+        public async Task<WorkItem> GetByWorkItemId(string workItemId)
         {
-            return DbSet
-                .Include(x => x.WorkItemsChanges)
-                .Include(x => x.TimeByStates)
-                .FirstOrDefault(x => x.Id == workItemId);
+            return await DbSet
+                          .Include(x => x.WorkItemsChanges)
+                          .Include(x => x.TimeByStates)
+                          .FirstOrDefaultAsync(x => x.Id == workItemId);
         }
 
-        public IEnumerable<WorkItem> ListByWorkItemId(IEnumerable<string> workItemsId)
+        public async Task<IEnumerable<WorkItem>> ListByWorkItemId(IEnumerable<string> workItemsId)
         {
-            return DbSet
-                .Include(x => x.WorkItemsChanges)
-                .Include(x => x.TimeByStates)
-                .Where(x => workItemsId.Contains(x.Id));
+            return await DbSet
+                          .Include(x => x.WorkItemsChanges)
+                          .Include(x => x.TimeByStates)
+                          .Where(x => workItemsId.Contains(x.Id))
+                          .ToListAsync();
         }
 
-        public IEnumerable<WorkItem> ListByIterationPath(string iterationPath)
+        public async Task<IEnumerable<WorkItem>> ListByIterationPath(string iterationPath)
         {
-            return DbSet
-                .Include(x => x.WorkItemsChanges)
-                .Include(x => x.TimeByStates)
-                .Where(x => x.IterationPath == iterationPath);
+            return await DbSet
+                          .Include(x => x.WorkItemsChanges)
+                          .Include(x => x.TimeByStates)
+                          .Where(x => x.IterationPath == iterationPath)
+                          .ToListAsync();
         }
 
         public void RemoveAllTimeByState(List<TimeByState> timeByStates)

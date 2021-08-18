@@ -1,18 +1,19 @@
 ﻿using AzureDevopsStateTracker.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AzureDevopsStateTracker.Interfaces.Internals
 {
     public interface IRepository<TEntity> : IDisposable where TEntity : Entity
     {
-        void Add(TEntity entity);
-        void Add(IEnumerable<TEntity> entities);
-        TEntity GetById(string id);
-        bool Exist(string id);
+        Task Add(TEntity entity);
+        Task Add(IEnumerable<TEntity> entities);
+        Task<TEntity> GetById(string id);
+        Task<bool> Exist(string id);
         void Update(TEntity entity);
         void Update(IEnumerable<TEntity> entities);
         void Delete(TEntity entity);
-        void SaveChanges();
+        Task SaveChangesAsync();
     }
 }

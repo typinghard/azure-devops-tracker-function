@@ -20,7 +20,6 @@ namespace AzureDevopsStateTracker.Entities
         public string StoryPoints { get; private set; }
         public string WorkItemParentId { get; private set; }
         public string Activity { get; private set; }
-
         private readonly List<WorkItemChange> _workItemsChanges;
         public IReadOnlyCollection<WorkItemChange> WorkItemsChanges => _workItemsChanges;
 
@@ -116,7 +115,7 @@ namespace AzureDevopsStateTracker.Entities
                 foreach (var data in workItemChange)
                 {
                     totalTime += data.CalculateTotalTime();
-                    totalWorkedTime += data.CalculateTotalWorkedTime();
+                    totalWorkedTime += TimeSpan.FromSeconds(data.CalculateTotalWorkedTime());
                 }
 
                 timesByStateList.Add(new TimeByState(Id, workItemChange.Key, totalTime, totalWorkedTime));

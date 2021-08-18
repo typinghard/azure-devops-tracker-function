@@ -7,6 +7,7 @@ using AzureDevopsStateTracker.Interfaces;
 using AzureDevopsStateTracker.Interfaces.Internals;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AzureDevopsStateTracker.Services
 {
@@ -22,7 +23,7 @@ namespace AzureDevopsStateTracker.Services
             _workItemRepository = workItemRepository;
         }
 
-        public void Create(CreateWorkItemDTO create)
+        public async Task Create(CreateWorkItemDTO create, bool addWorkItemChange = true)
         {
             var workItem = new WorkItem(create.Resource.Id);
 
@@ -40,15 +41,33 @@ namespace AzureDevopsStateTracker.Services
                             create.Resource.Fields.OriginalEstimate,
                             create.Resource.Fields.Activity);
 
-            AddWorkItemChange(workItem, create);
+            if (addWorkItemChange)
+                AddWorkItemChange(workItem, create);
 
-            _workItemRepository.Add(workItem);
-            _workItemRepository.SaveChanges();
+            await _workItemRepository.Add(workItem);
+            await _workItemRepository.SaveChangesAsync();
         }
 
-        public void Update(UpdatedWorkItemDTO update)
+        public async Task Create(UpdatedWorkItemDTO updateDto)
         {
-            var workItem = _workItemRepository.GetByWorkItemId(update.Resource.WorkItemId);
+            var createDto = new CreateWorkItemDTO()
+            {
+                Resource = new DTOs.Create.Resource()
+                {
+                    Fields = updateDto.Resource.Revision.Fields,
+                    Id = updateDto.Resource.WorkItemId,
+                }
+            };
+
+            await Create(createDto, false);
+        }
+
+        public async Task Update(UpdatedWorkItemDTO update)
+        {
+            if (!_workItemRepository.Exist(update.Resource.WorkItemId).Result)
+                await Create(update);
+
+            var workItem = await _workItemRepository.GetByWorkItemId(update.Resource.WorkItemId);
             if (workItem is null)
                 return;
 
@@ -69,12 +88,12 @@ namespace AzureDevopsStateTracker.Services
             AddWorkItemChange(workItem, update);
 
             _workItemRepository.Update(workItem);
-            _workItemRepository.SaveChanges();
+            await _workItemRepository.SaveChangesAsync();
         }
 
-        public WorkItemDTO GetByWorkItemId(string workItemId)
+        public async Task<WorkItemDTO> GetByWorkItemId(string workItemId)
         {
-            var workItem = _workItemRepository.GetByWorkItemId(workItemId);
+            var workItem = await _workItemRepository.GetByWorkItemId(workItemId);
             if (workItem is null)
                 return null;
 
@@ -91,7 +110,7 @@ namespace AzureDevopsStateTracker.Services
         {
             var workItemChange = ToWorkItemChange(workItem.Id,
                                                   create.Resource.Fields.ChangedBy,
-                                                  create.Resource.Fields.CreatedDate,
+                                                  create.Resource.Fields.CreatedDate.ToDateTimeFromTimeZoneInfo(),
                                                   create.Resource.Fields.State);
 
             workItem.AddWorkItemChange(workItemChange);
@@ -102,10 +121,10 @@ namespace AzureDevopsStateTracker.Services
             var changedBy = update.Resource.Revision.Fields.ChangedBy ?? update.Resource.Fields.ChangedBy.NewValue;
             var workItemChange = ToWorkItemChange(workItem.Id,
                                       changedBy,
-                                      update.Resource.Fields.StateChangeDate.NewValue,
+                                      update.Resource.Fields.StateChangeDate.NewValue.ToDateTimeFromTimeZoneInfo(),
                                       update.Resource.Fields.State.NewValue,
                                       update.Resource.Fields.State.OldValue,
-                                      update.Resource.Fields.StateChangeDate.OldValue);
+                                      update.Resource.Fields.StateChangeDate.OldValue.ToDateTimeFromTimeZoneInfo());
 
             workItem.AddWorkItemChange(workItemChange);
 

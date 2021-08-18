@@ -4,7 +4,7 @@ using AzureDevopsStateTracker.Interfaces.Internals;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace AzureDevopsStateTracker.Data
 {
@@ -19,14 +19,14 @@ namespace AzureDevopsStateTracker.Data
             DbSet = db.Set<TEntity>();
         }
 
-        public virtual void Add(TEntity entity)
+        public virtual async Task Add(TEntity entity)
         {
-            DbSet.Add(entity);
+            await DbSet.AddAsync(entity);
         }
 
-        public virtual void Add(IEnumerable<TEntity> entities)
+        public virtual async Task Add(IEnumerable<TEntity> entities)
         {
-            DbSet.AddRange(entities);
+            await DbSet.AddRangeAsync(entities);
         }
 
         public virtual void Update(TEntity entity)
@@ -44,22 +44,21 @@ namespace AzureDevopsStateTracker.Data
             DbSet.Remove(entity);
         }
 
-        public virtual TEntity GetById(string id)
+        public virtual async Task<TEntity> GetById(string id)
         {
-            return DbSet
-                .Where(x => x.Id == id)
-                .FirstOrDefault();
+            return await DbSet
+                          .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public bool Exist(string id)
+        public async Task<bool> Exist(string id)
         {
-            return DbSet
-                    .Any(x => x.Id == id);
+            return await DbSet
+                          .AnyAsync(x => x.Id == id);
         }
-        
-        public void SaveChanges()
+
+        public async Task SaveChangesAsync()
         {
-            Db.SaveChanges();
+            await Db.SaveChangesAsync();
         }
 
         public void Dispose()

@@ -1,15 +1,16 @@
+using AzureDevopsStateTracker.DTOs.Create;
+using AzureDevopsStateTracker.DTOs.Update;
+using AzureDevopsStateTracker.Services;
+using AzureDevOpsStateTracker.Functions.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using AzureDevopsStateTracker.Services;
-using AzureDevOpsStateTracker.Functions.Extensions;
 using Newtonsoft.Json;
-using AzureDevopsStateTracker.DTOs.Create;
-using AzureDevopsStateTracker.DTOs.Update;
-using System.Net;
 using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace AzureDevOpsStateTracker.Functions
 {
@@ -24,7 +25,7 @@ namespace AzureDevOpsStateTracker.Functions
         }
 
         [FunctionName("workitem")]
-        public IActionResult Create(
+        public async Task<IActionResult> Create(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -32,7 +33,7 @@ namespace AzureDevOpsStateTracker.Functions
             try
             {
                 var workItemDTO = JsonConvert.DeserializeObject<CreateWorkItemDTO>(req.GetBody());
-                _azureDevopsStateTrackerService.Create(workItemDTO);
+                await _azureDevopsStateTrackerService.Create(workItemDTO);
             }
             catch (Exception ex)
             {
@@ -43,14 +44,14 @@ namespace AzureDevOpsStateTracker.Functions
         }
 
         [FunctionName("workitem-update")]
-        public IActionResult Update(
+        public async Task<IActionResult> Update(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
             {
                 var workItemDTO = JsonConvert.DeserializeObject<UpdatedWorkItemDTO>(req.GetBody());
-                _azureDevopsStateTrackerService.Update(workItemDTO);
+                await _azureDevopsStateTrackerService.Update(workItemDTO);
             }
             catch (Exception ex)
             {

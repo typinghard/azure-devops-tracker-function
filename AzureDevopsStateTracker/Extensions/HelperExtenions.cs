@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AzureDevopsStateTracker.Data;
+using System;
 using System.Linq;
 
 namespace AzureDevopsStateTracker.Extensions
@@ -36,6 +37,11 @@ namespace AzureDevopsStateTracker.Extensions
                 return $@"{timeSpan:%s} s";
 
             return "-";
+        }
+
+        public static DateTime ToDateTimeFromTimeZoneInfo(this DateTime date)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(date, DataBaseConfig.TimeZoneInfo);
         }
     }
 }

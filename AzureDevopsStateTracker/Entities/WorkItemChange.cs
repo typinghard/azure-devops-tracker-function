@@ -35,25 +35,128 @@ namespace AzureDevopsStateTracker.Entities
 
         public TimeSpan CalculateTotalTime()
         {
-            return OldDate == null ? TimeSpan.Zero : NewDate - OldDate.GetValueOrDefault();
+            return OldDate == null ? TimeSpan.Zero : NewDate.ToDateTimeFromTimeZoneInfo() - OldDate.Value.ToDateTimeFromTimeZoneInfo();
         }
 
-        public TimeSpan CalculateTotalWorkedTime()
+        public double CalculateTotalWorkedTime()
         {
             if (OldDate.GetValueOrDefault() == DateTime.MinValue)
-                return TimeSpan.Zero;
+                return 0;
 
-            TimeSpan hoursWorked = TimeSpan.Zero;
-            for (var i = OldDate.GetValueOrDefault(); i <= NewDate; i = i.AddHours(1))
+            var oldDate = OldDate.Value.ToDateTimeFromTimeZoneInfo();
+            var newDate = NewDate.ToDateTimeFromTimeZoneInfo();
+
+            var secondsWorked = 0D;
+            var majorDateBeforeLunch = DateTime.MinValue;
+            var minorDateBeforeLunch = DateTime.MinValue;
+            var majorDateAfterLunch = DateTime.MinValue;
+            var minorDateAfterLunch = DateTime.MinValue;
+
+            DateTime dataAux = DateTime.MinValue;
+            int diasCompletos = 0;
+
+            TimeSpan afterLunch;
+            TimeSpan beforeLunch;
+
+            for (var dateAux = oldDate; dateAux <= newDate; dateAux = dateAux.AddSeconds(1))
             {
-                if (i.DayOfWeek != DayOfWeek.Saturday && i.DayOfWeek != DayOfWeek.Sunday)
+                if (dateAux.DayOfWeek == DayOfWeek.Saturday || dateAux.DayOfWeek == DayOfWeek.Sunday)
+                    continue;
+
+                if (dateAux.TimeOfDay.Hours >= 12 && dateAux.TimeOfDay.Hours < 14)
+                    continue;
+
+                if (dateAux.TimeOfDay.Hours > 18 && dateAux.TimeOfDay.Hours < 23 ||
+                    dateAux.TimeOfDay.Hours >= 0 && dateAux.TimeOfDay.Hours < 8)
+                    continue;
+
+                if (dataAux == DateTime.MinValue)
+                    dataAux = dateAux;
+
+                if (dataAux != DateTime.MinValue && dataAux.Date != dateAux.Date)
                 {
-                    if ((i.TimeOfDay.Hours >= 8 && i.TimeOfDay.Hours < 12) || (i.TimeOfDay.Hours >= 14 && i.TimeOfDay.Hours < 18))
-                        hoursWorked += (NewDate.TimeOfDay - i.TimeOfDay);
+                    beforeLunch = SubtractDates(majorDateBeforeLunch, minorDateBeforeLunch);
+                    afterLunch = SubtractDates(majorDateAfterLunch, minorDateAfterLunch);
+
+                    if ((beforeLunch + afterLunch).Hours == 8)
+                        diasCompletos++;
+                    else
+                        secondsWorked += (beforeLunch + afterLunch).TotalSeconds;
+
+                    majorDateBeforeLunch = DateTime.MinValue;
+                    minorDateBeforeLunch = DateTime.MinValue;
+
+                    majorDateAfterLunch = DateTime.MinValue;
+                    minorDateAfterLunch = DateTime.MinValue;
+                    dataAux = dateAux;
                 }
+
+                if (dateAux.TimeOfDay.Hours >= 8 && dateAux.TimeOfDay.Hours < 12)
+                {
+                    if (minorDateBeforeLunch == DateTime.MinValue || dateAux < minorDateBeforeLunch)
+                        minorDateBeforeLunch = dateAux;
+
+                    if (majorDateBeforeLunch == DateTime.MinValue || dateAux > majorDateBeforeLunch)
+                        majorDateBeforeLunch = dateAux;
+
+                    continue;
+                }
+
+                if (dateAux.TimeOfDay.Hours >= 14 && dateAux.TimeOfDay.Hours < 18)
+                {
+                    if (minorDateAfterLunch == DateTime.MinValue || dateAux < minorDateAfterLunch)
+                        minorDateAfterLunch = dateAux;
+
+                    if (majorDateAfterLunch == DateTime.MinValue || dateAux > majorDateAfterLunch)
+                        majorDateAfterLunch = dateAux;
+
+                    continue;
+                }
+
             }
 
-            return hoursWorked;
+            if (dataAux != DateTime.MinValue &&
+                oldDate.Date == newDate.Date ||
+                (majorDateBeforeLunch != DateTime.MinValue || minorDateBeforeLunch != DateTime.MinValue) ||
+                (majorDateAfterLunch != DateTime.MinValue || minorDateAfterLunch != DateTime.MinValue))
+            {
+                beforeLunch = SubtractDates(majorDateBeforeLunch, minorDateBeforeLunch);
+                afterLunch = SubtractDates(majorDateAfterLunch, minorDateAfterLunch);
+
+                secondsWorked += (beforeLunch + afterLunch).TotalSeconds;
+            }
+
+            if (diasCompletos > 0)
+                secondsWorked += diasCompletos * 28800;
+
+            return secondsWorked;
+        }
+
+        private TimeSpan SubtractDates(DateTime biger, DateTime minor)
+        {
+            if (biger.Hour == minor.Hour)
+            {
+                return biger.Subtract(minor);
+            }
+            else if (biger.Hour > 8 && biger.Hour == 11 && biger.Minute == 59)
+            {
+                var newMajorDate = new DateTime(biger.Year, biger.Month, biger.Day, 12, 0, 0);
+                return newMajorDate.Subtract(minor);
+            }
+            else if (biger.Hour > 14 && biger.Hour < minor.Hour)
+            {
+                var newMinorDate = new DateTime(minor.Year, minor.Month, minor.Day, 14, 0, 0);
+                return biger.Subtract(newMinorDate);
+            }
+            else if (biger.Hour > 14 && biger.Hour == 17 && biger.Minute == 59)
+            {
+                var newMajorDate = new DateTime(biger.Year, biger.Month, biger.Day, 18, 0, 0);
+                return newMajorDate.Subtract(minor);
+            }
+            else
+            {
+                return biger.Subtract(minor);
+            }
         }
     }
 }
