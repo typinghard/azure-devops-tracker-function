@@ -19,7 +19,7 @@ namespace AzureDevOpsTracker.Functions
             builder.Services.AddScoped<ServiceToInject>();
             builder.Services.AddScoped<AzureDevopsTrackerService>();
 
-            builder.Services.AddAzureDevopsTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection"], "Tracker"));
+            builder.Services.AddAzureDevopsTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection"]));
         }
     }
 }
