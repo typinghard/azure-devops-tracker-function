@@ -1,7 +1,7 @@
-using AzureDevopsStateTracker.DTOs.Create;
-using AzureDevopsStateTracker.DTOs.Update;
-using AzureDevopsStateTracker.Services;
 using AzureDevOpsStateTracker.Functions.Extensions;
+using AzureDevopsTracker.DTOs.Create;
+using AzureDevopsTracker.DTOs.Update;
+using AzureDevopsTracker.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -12,16 +12,16 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace AzureDevOpsStateTracker.Functions
+namespace AzureDevOpsTracker.Functions
 {
     public class WorkItemFunctions
     {
-        private readonly AzureDevopsStateTrackerService _azureDevopsStateTrackerService;
+        private readonly AzureDevopsTrackerService _azureDevopsTrackerService;
 
         public WorkItemFunctions(
-            AzureDevopsStateTrackerService azureDevopsStateTrackerService)
+            AzureDevopsTrackerService azureDevopsTrackerService)
         {
-            _azureDevopsStateTrackerService = azureDevopsStateTrackerService;
+            _azureDevopsTrackerService = azureDevopsTrackerService;
         }
 
         [FunctionName("workitem")]
@@ -33,7 +33,7 @@ namespace AzureDevOpsStateTracker.Functions
             try
             {
                 var workItemDTO = JsonConvert.DeserializeObject<CreateWorkItemDTO>(req.GetBody());
-                await _azureDevopsStateTrackerService.Create(workItemDTO);
+                await _azureDevopsTrackerService.Create(workItemDTO);
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace AzureDevOpsStateTracker.Functions
             try
             {
                 var workItemDTO = JsonConvert.DeserializeObject<UpdatedWorkItemDTO>(req.GetBody());
-                await _azureDevopsStateTrackerService.Update(workItemDTO);
+                await _azureDevopsTrackerService.Update(workItemDTO);
             }
             catch (Exception ex)
             {
