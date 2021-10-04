@@ -1,13 +1,14 @@
-﻿using AzureDevopsStateTracker.Configurations;
-using AzureDevopsStateTracker.Data;
-using AzureDevopsStateTracker.Services;
-using AzureDevOpsStateTracker.Functions;
+﻿using AzureDevOpsStateTracker.Functions;
+using AzureDevopsTracker.Configurations;
+using AzureDevopsTracker.Data;
+using AzureDevopsTracker.Services;
+using AzureDevOpsTracker.Functions;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
-namespace AzureDevOpsStateTracker.Functions
+namespace AzureDevOpsTracker.Functions
 {
     public class Startup : FunctionsStartup
     {
@@ -16,9 +17,9 @@ namespace AzureDevOpsStateTracker.Functions
             var configuration = builder.GetContext().Configuration;
 
             builder.Services.AddScoped<ServiceToInject>();
-            builder.Services.AddScoped<AzureDevopsStateTrackerService>();
+            builder.Services.AddScoped<AzureDevopsTrackerService>();
 
-            builder.Services.AddAzureDevopsStateTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection"], "StateTracker"));
+            builder.Services.AddAzureDevopsTracker(new DataBaseConfig(configuration["ConnectionStrings:DefaultConnection"], "Tracker"));
         }
     }
 }
