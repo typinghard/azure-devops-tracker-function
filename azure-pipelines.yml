@@ -8,7 +8,7 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '061440c6-b8b2-41ab-98dc-8863642471ff'
+  azureSubscription: '53eedeb9-cc9a-428e-aee0-e19b1501f238'
 
   # Function app name
   functionAppName: 'func-azure-devops-state-tracker'
